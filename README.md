@@ -1,13 +1,5 @@
 # Proximity-Sensor-Calibration-with-the-Microcontroller-EFM8BB52
 
-Okay, here is the documentation for the project based on the files provided.
-
----
-
-## Project Documentation: Proximity 15 Click Sensor Interface
-
-**Current Date:** April 2, 2025
-
 ### 1. Project Overview
 
 This project aims to interface with a MikroElektronika Proximity 15 Click board using a Silicon Labs EFM8BB52 microcontroller. The goal is to initialize the sensor, configure it for continuous distance measurement, read the distance values in millimeters, and output them (currently planned via `printf`). The project utilizes a dedicated driver library (`proximity15.h`, `proximity15.c`) for sensor communication and control.
@@ -92,7 +84,3 @@ Before the project can be fully functional and compiled/tested, the following it
 4.  **Delay Function Implementation:** Verify that the required delay functions (`Delay_500us`, `Delay_1sec` used in `proximity15.c`, and `delay_ms` used in `main.c`) are available, correctly implemented, and reliable on the EFM8BB52 platform. Ensure consistency if necessary.
 5.  **Code Correction:** Remove the redundant call to `proximity15_clear_interrupt(&proximity15_dev);` from the `while(1)` loop in `main.c`.
 6.  **Compilation and Debugging:** Compile the code using the appropriate toolchain for the EFM8BB52 and debug its execution on the target hardware.
-
----
-
-This documentation provides a snapshot of the project based on the code provided. Once the "Remaining Tasks" are completed, further testing and refinement can occur. Let me know when you're ready to move on to debugging specific parts.
