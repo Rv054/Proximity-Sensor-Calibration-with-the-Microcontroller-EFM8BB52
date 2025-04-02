@@ -2,7 +2,10 @@
  * proximity15.h
  *
  *  Created on: 31.03.2025
- *      Author: User
+ *      Author: Rishi Vaghasiya
+ *      Original Creator: MikroElektronika
+ *      Copyright (C) 2020 MikroElektronika d.o.o.
+ *      Contact: https://www.mikroe.com/contact
  */
 
 /*!
