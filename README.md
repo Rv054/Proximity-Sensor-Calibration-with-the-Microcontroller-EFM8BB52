@@ -79,8 +79,3 @@ This project aims to interface the **VL53L1X Time-of-Flight distance sensor** (v
 - Silicon Labs Simplicity Studio
 - EFM8BB52 SDK
 - Proximity 15 Click hardware (VL53L1X)
-- Oscilloscope (optional for timing validation)
-
-## 9. Screenshot (Example Output)
-
-> Include UART output image showing raw or formatted distance readings.
