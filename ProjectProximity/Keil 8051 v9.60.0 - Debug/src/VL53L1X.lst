@@ -1,0 +1,278 @@
+C51 COMPILER V9.60.0.0   VL53L1X                                                           04/30/2025 14:59:25 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE VL53L1X
+OBJECT MODULE PLACED IN .\src\VL53L1X.OBJ
+COMPILER INVOKED BY: C:\SiliconLabs\SimplicityStudio\v5\developer\toolchains\keil_8051\9.60\BIN\C51.exe C:\Users\User\Si
+                    -mplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c OMF2 SMALL DEBUG OBJECTEXTEND ROM(LARGE) WARNINGLEVEL(2) FLOATFU
+                    -ZZY(3) OPTIMIZE(8,SPEED) DEFINE(DEBUG=1) INTVECTOR(0X0000) INTPROMOTE INCDIR(C:\Users\User\SimplicityStudio\v5_workspace
+                    -\6_Testing_I2C\inc;C:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.3.1//kits/common/bsp;C:/SiliconLabs/Simplic
+                    -ityStudio/v5/developer/sdks/8051/v4.3.1//kits/EFM8BB52_BRD2701A/config;C:/SiliconLabs/SimplicityStudio/v5/developer/sdks
+                    -/8051/v4.3.1//Device/shared/si8051Base;C:/SiliconLabs/SimplicityStudio/v5/developer/sdks/8051/v4.3.1//Device/EFM8BB52/in
+                    -c) PRINT(.\src\VL53L1X.lst) COND PAGEWIDTH(120) PAGELENGTH(65) OBJECT(.\src\VL53L1X.OBJ)
+
+line level    source
+
+   1          #include <SI_EFM8BB52_Register_Enums.h>
+   2          #include "VL53L1X.h"
+   3          
+   4          //unsigned int distance;
+   5          //unsigned int timeout;
+   6          //uint16_t  model_id;
+   7          
+   8          extern idata unsigned char I2C0_BUF_OUT[8];
+   9          extern idata unsigned char I2C0_BUF_IN[8];
+  10          
+  11          //static unsigned int fast_osc_frequency;
+  12          //static unsigned int osc_calibrate_val;
+  13          
+  14          static void VL53L1X_WriteReg16(unsigned int reg, unsigned int value);
+  15          static unsigned int VL53L1X_ReadReg16(unsigned int reg);
+  16          static unsigned int VL53L1X_ReadReg(unsigned int reg);
+  17          static void VL53L1X_WriteReg(unsigned int reg, unsigned int value);
+  18          static void VL53L1X_WriteReg32(uint16_t reg, uint32_t value);
+  19          extern bit I2C0_transfer(unsigned int address, unsigned int *write_buf, unsigned int *read_buf, unsigned i
+             -nt write_len, unsigned int read_len);
+  20          extern void delay_ms(unsigned int ms);
+  21          
+  22          // Low-level register access functions
+  23          static void VL53L1X_WriteReg(unsigned int reg, unsigned int value)
+  24          {
+  25   1          I2C0_BUF_OUT[0] = (reg >> 8) & 0xFF;
+  26   1          I2C0_BUF_OUT[1] = reg & 0xFF;
+  27   1          I2C0_BUF_OUT[2] = value;
+  28   1          I2C0_transfer(VL53L1X_DEFAULT_ADDR << 1, I2C0_BUF_OUT, I2C0_BUF_IN, 3, 0);
+*** WARNING C182 IN LINE 28 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+*** WARNING C182 IN LINE 28 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+  29   1      }
+  30          
+  31          static unsigned int VL53L1X_ReadReg(unsigned int reg)
+  32          {
+  33   1          I2C0_BUF_OUT[0] = (reg >> 8) & 0xFF;
+  34   1          I2C0_BUF_OUT[1] = reg & 0xFF;
+  35   1          I2C0_transfer(VL53L1X_DEFAULT_ADDR << 1, I2C0_BUF_OUT, I2C0_BUF_IN, 2, 1);
+*** WARNING C182 IN LINE 35 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+*** WARNING C182 IN LINE 35 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+  36   1          return I2C0_BUF_IN[0];
+  37   1      }
+  38          
+  39          static void VL53L1X_WriteReg16(unsigned int reg, unsigned int value)
+  40          {
+  41   1          I2C0_BUF_OUT[0] = (reg >> 8) & 0xFF;
+C51 COMPILER V9.60.0.0   VL53L1X                                                           04/30/2025 14:59:25 PAGE 2   
+
+  42   1          I2C0_BUF_OUT[1] = reg & 0xFF;
+  43   1          I2C0_BUF_OUT[2] = (value >> 8) & 0xFF;
+  44   1          I2C0_BUF_OUT[3] = value & 0xFF;
+  45   1          I2C0_transfer(VL53L1X_DEFAULT_ADDR << 1, I2C0_BUF_OUT, I2C0_BUF_IN, 4, 0);
+*** WARNING C182 IN LINE 45 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+*** WARNING C182 IN LINE 45 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+  46   1      }
+  47          
+  48          static void VL53L1X_WriteReg32(uint16_t reg, uint32_t value)
+  49          {
+  50   1          I2C0_BUF_OUT[0] = (uint8_t)(reg >> 8);   // High byte of register
+  51   1          I2C0_BUF_OUT[1] = (uint8_t)(reg & 0xFF); // Low byte of register
+  52   1          I2C0_BUF_OUT[2] = (uint8_t)(value >> 24); // Most significant byte
+  53   1          I2C0_BUF_OUT[3] = (uint8_t)(value >> 16);
+  54   1          I2C0_BUF_OUT[4] = (uint8_t)(value >> 8);
+  55   1          I2C0_BUF_OUT[5] = (uint8_t)(value & 0xFF); // Least significant byte
+  56   1          I2C0_transfer((VL53L1X_DEFAULT_ADDR << 1), (uint8_t *)I2C0_BUF_OUT, 6, 0);
+*** WARNING C182 IN LINE 56 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+*** WARNING C209 IN LINE 56 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: '_I2C0_transfer'
+             -: too few actual parameters
+*** WARNING C196 IN LINE 56 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: mspace probably 
+             -invalid
+  57   1      }
+  58          
+  59          static unsigned int VL53L1X_ReadReg16(unsigned int reg)
+  60          {
+  61   1          I2C0_BUF_OUT[0] = (reg >> 8) & 0xFF;
+  62   1          I2C0_BUF_OUT[1] = reg & 0xFF;
+  63   1          I2C0_transfer(VL53L1X_DEFAULT_ADDR << 1, I2C0_BUF_OUT, I2C0_BUF_IN, 2, 2);
+*** WARNING C182 IN LINE 63 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+*** WARNING C182 IN LINE 63 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: pointer to diffe
+             -rent objects
+  64   1          return ((unsigned int)I2C0_BUF_IN[0] << 8) | I2C0_BUF_IN[1];
+  65   1      }
+  66          
+  67          // Public functions
+  68          bit VL53L1X_Init(void)
+  69          {
+  70   1          uint16_t model_id;
+  71   1          uint32_t timeout;
+  72   1      
+  73   1          model_id = VL53L1X_ReadReg16(0x010F);
+  74   1          if (model_id != 0xEACC)
+  75   1              return 0;
+  76   1      
+  77   1          VL53L1X_WriteReg(0x0000, 0x00); // Software reset
+  78   1          delay_ms(100);
+  79   1          VL53L1X_WriteReg(0x0000, 0x01);
+  80   1          delay_ms(100);
+  81   1      
+  82   1          // Boot complete check
+  83   1          timeout = VL53L1X_TIMEOUT_MS;
+  84   1          //while ((VL53L1X_ReadReg(0x00E5) & 0x01) == 0 && timeout--) ;
+  85   1          while (!(VL53L1X_ReadReg(0x00E5) & 0x01))
+  86   1              {
+  87   2                  delay_ms(1);
+  88   2                  if (--timeout == 0)
+  89   2                    return 0;
+  90   2              }
+C51 COMPILER V9.60.0.0   VL53L1X                                                           04/30/2025 14:59:25 PAGE 3   
+
+  91   1          // Step 4: Basic configuration (STATIC INIT)
+  92   1          VL53L1X_WriteReg(0x0891, 0x00); // PAD_I2C_HV__EXTSUP_CONFIG
+  93   1      
+  94   1          // Configure default static settings
+  95   1          VL53L1X_WriteReg16(0x002D, 0x0A00); // DSS_CONFIG__TARGET_TOTAL_RATE_MCPS = 1024
+  96   1      
+  97   1          VL53L1X_WriteReg(0x00FF, 0x01); // SYSTEM__GROUPED_PARAMETER_HOLD = 1
+  98   1      
+  99   1          // Distance Mode: Long
+ 100   1          VL53L1X_WriteReg(0x0050, 0x0F); // VCSEL_PERIOD_A
+ 101   1          VL53L1X_WriteReg(0x0051, 0x0D); // VCSEL_PERIOD_B
+ 102   1          VL53L1X_WriteReg(0x0072, 0xB8); // VALID_PHASE_HIGH
+ 103   1          VL53L1X_WriteReg(0x005E, 0x0F); // WOI_SD0
+ 104   1          VL53L1X_WriteReg(0x005F, 0x0D); // WOI_SD1
+ 105   1          VL53L1X_WriteReg(0x0060, 14);   // INITIAL_PHASE_SD0
+ 106   1          VL53L1X_WriteReg(0x0061, 14);   // INITIAL_PHASE_SD1
+ 107   1      
+ 108   1          // Timing Budget: 50ms
+ 109   1          VL53L1X_WriteReg16(0x006E, 0x01C2); // TIMEOUT_MACROP_A
+ 110   1          VL53L1X_WriteReg16(0x006F, 0x01C2); // TIMEOUT_MACROP_B
+ 111   1      
+ 112   1          // DSS configuration
+ 113   1          VL53L1X_WriteReg(0x0070, 0x01); // DSS_CONFIG__ROI_MODE_CONTROL
+ 114   1          VL53L1X_WriteReg16(0x002E, 0x0800); // DSS_CONFIG__MANUAL_EFFECTIVE_SPADS_SELECT = 2048
+ 115   1      
+ 116   1          VL53L1X_WriteReg(0x00FF, 0x00); // SYSTEM__GROUPED_PARAMETER_HOLD = 0
+ 117   1      
+ 118   1          // Final seed configuration
+ 119   1          VL53L1X_WriteReg(0x0064, 0x00); // SYSTEM__SEED_CONFIG
+ 120   1      
+ 121   1          return 1;
+ 122   1      }
+ 123          
+ 124          void VL53L1X_StartRanging(void)
+ 125          {
+ 126   1          uint16_t osc_calibrate_val;
+ 127   1          // Intermeasurement period (adjust based on timing budget)
+ 128   1          osc_calibrate_val = VL53L1X_ReadReg16(0x00DE);  // RESULT__OSC_CALIBRATE_VAL
+ 129   1      
+ 130   1          if (osc_calibrate_val != 0)
+ 131   1          {
+ 132   2              VL53L1X_WriteReg32(0x006C, osc_calibrate_val * 50);  // SYSTEM__INTERMEASUREMENT_PERIOD
+ 133   2          }
+ 134   1          else
+ 135   1          {
+ 136   2              VL53L1X_WriteReg32(0x006C, 50 * 0x800);  // Fallback safe value
+ 137   2          }
+ 138   1      
+ 139   1          VL53L1X_WriteReg(0x0007, 0x40); // SYSTEM__MODE_START = Continuous Ranging
+ 140   1      }
+ 141          
+ 142          void VL53L1X_StopRanging(void)
+ 143          {
+ 144   1          VL53L1X_WriteReg(0x0007, 0x00); // SYSTEM__MODE_START = Continuous Ranging
+ 145   1      }
+ 146          
+ 147          unsigned int VL53L1X_ReadDistance(void)
+ 148          {
+ 149   1          uint16_t model_id;
+ 150   1          uint32_t timeout;
+ 151   1          unsigned int distance;
+ 152   1      
+ 153   1          timeout = VL53L1X_TIMEOUT_MS;
+C51 COMPILER V9.60.0.0   VL53L1X                                                           04/30/2025 14:59:25 PAGE 4   
+
+ 154   1          while (!(VL53L1X_ReadReg(0x0089) & 0x01) && timeout--) ;
+ 155   1      
+ 156   1          distance = VL53L1X_ReadReg16(0x0096);
+ 157   1          VL53L1X_WriteReg(0x0086, 0x01); // Clear interrupt
+ 158   1      
+ 159   1          return distance;
+ 160   1      }
+*** WARNING C280 IN LINE 149 OF C:\Users\User\SimplicityStudio\v5_workspace\6_Testing_I2C\src\VL53L1X.c: 'model_id': unr
+             -eferenced local variable
+ 161          
+ 162          bit VL53L1X_SetDistanceMode(unsigned int mode)
+ 163          {
+ 164   1          switch (mode)
+ 165   1          {
+ 166   2              case VL53L1X_DISTANCEMODE_SHORT:
+ 167   2                  VL53L1X_WriteReg(0x0050, 0x07);
+ 168   2                  VL53L1X_WriteReg(0x0051, 0x05);
+ 169   2                  break;
+ 170   2      
+ 171   2              case VL53L1X_DISTANCEMODE_MEDIUM:
+ 172   2                  VL53L1X_WriteReg(0x0050, 0x0B);
+ 173   2                  VL53L1X_WriteReg(0x0051, 0x09);
+ 174   2                  break;
+ 175   2      
+ 176   2              case VL53L1X_DISTANCEMODE_LONG:
+ 177   2                  VL53L1X_WriteReg(0x0050, 0x0F);
+ 178   2                  VL53L1X_WriteReg(0x0051, 0x0D);
+ 179   2                  break;
+ 180   2      
+ 181   2              default:
+ 182   2                  return 0;
+ 183   2          }
+ 184   1      
+ 185   1          return 1;
+ 186   1      }
+ 187          
+ 188          bit VL53L1X_SetTimingBudget(unsigned int timing_budget_us)
+ 189          {
+ 190   1          if (timing_budget_us < 20000 || timing_budget_us > 1000000)
+ 191   1              return 0;
+ 192   1      
+ 193   1          VL53L1X_WriteReg16(0x0004, timing_budget_us);
+ 194   1          return 1;
+ 195   1      }
+ 196          
+ 197          void VL53L1X_SetROISize(unsigned int width, unsigned int height)
+ 198          {
+ 199   1          width  = (width  > 16) ? 16 : width;
+ 200   1          height = (height > 16) ? 16 : height;
+ 201   1          VL53L1X_WriteReg(0x013E, (height - 1) << 4 | (width - 1));
+ 202   1      }
+ 203          
+ 204          void VL53L1X_SetROICenter(unsigned int spad_number)
+ 205          {
+ 206   1          VL53L1X_WriteReg(0x013D, spad_number);
+ 207   1      }
+ 208          
+ 209          unsigned int VL53L1X_GetROICenter(void)
+ 210          {
+ 211   1          return VL53L1X_ReadReg(0x013D);
+ 212   1      }
+
+
+C51 COMPILER V9.60.0.0   VL53L1X                                                           04/30/2025 14:59:25 PAGE 5   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    896    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      18
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  12 WARNING(S),  0 ERROR(S)
